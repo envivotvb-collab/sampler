@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sampler 16 Pads - Monophonic Mode</title>
+  <style>
+    :root {
+      --bg-color: #0b0b0e;
+      --panel-bg: #13131a;
+      --pad-color: #1c1c24;
+      --pad-active: #ff0055;
+      --text-color: #ffffff;
+      --text-muted: #64748b;
+    }
+
+    body {
+      margin: 0;
+      padding: 15px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      margin: 0 0 5px 0;
+      font-size: 1.6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin: 0 0 20px 0;
+      font-size: 0.85rem;
+      text-align: center;
+      max-width: 500px;
+    }
+
+    .master-controls {
+      background: var(--panel-bg);
+      border: 1px solid #27273a;
+      padding: 12px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 600px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stop-btn {
+      background-color: #ef4444;
+      border: none;
+      color: white;
+      padding: 8px 24px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .stop-btn:hover {
+      background-color: #dc2626;
+    }
+
+    .sampler-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .pad-container {
+      background-color: var(--panel-bg);
+      border: 1px solid #27273a;
+      padding: 8px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pad {
+      background-color: var(--pad-color);
+      border: 2px solid #2d2d3d;
+      border-radius: 10px;
+      height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.05s ease;
+      position: relative;
+      user-select: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    .pad:active, .pad.playing {
+      background-color: var(--pad-active);
+      border-color: #fff;
+      transform: scale(0.96);
+      box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
+    }
+
+    .pad:active .key, .pad.playing .key {
+      color: #000000;
+    }
+
+    .key {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .native-audio-input {
+      width: 100%;
+      font-size: 0.65rem;
+      color: #94a3b8;
+      background: #1c1c24;
+      border: 1px solid #3f3f56;
+      border-radius: 4px;
+      padding: 2px;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    .status-bar {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: var(--pad-active);
+      min-height: 18px;
+      text-align: center;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>SAMPLER PRO 16</h1>
+  <p class="subtitle">Modo Monofónico: Cada canción que toques detendrá la anterior de forma automática.</p>
+
+  <div class="master-controls">
+    <button class="stop-btn" id="stop-all-btn">🛑 DETENER TODO (STOP ALL)</button>
+  </div>
+
+  <div class="sampler-grid">
+    <!-- FILA 1 -->
+    <div class="pad-container">
+      <div class="pad" data-key="Digit1" id="pad-Digit1"><span class="key">1</span></div>
+      <input type="file" class="native-audio-input" id="file-Digit1" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="Digit2" id="pad-Digit2"><span class="key">2</span></div>
+      <input type="file" class="native-audio-input" id="file-Digit2" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="Digit3" id="pad-Digit3"><span class="key">3</span></div>
+      <input type="file" class="native-audio-input" id="file-Digit3" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="Digit4" id="pad-Digit4"><span class="key">4</span></div>
+      <input type="file" class="native-audio-input" id="file-Digit4" accept="audio/*">
+    </div>
+
+    <!-- FILA 2 -->
+    <div class="pad-container">
+      <div class="pad" data-key="KeyQ" id="pad-KeyQ"><span class="key">Q</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyQ" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="KeyW" id="pad-KeyW"><span class="key">W</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyW" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="KeyE" id="pad-KeyE"><span class="key">E</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyE" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="KeyR" id="pad-KeyR"><span class="key">R</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyR" accept="audio/*">
+    </div>
+
+    <!-- FILA 3 -->
+    <div class="pad-container">
+      <div class="pad" data-key="KeyA" id="pad-KeyA"><span class="key">A</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyA" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="KeyS" id="pad-KeyS"><span class="key">S</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyS" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="KeyD" id="pad-KeyD"><span class="key">D</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyD" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="KeyF" id="pad-KeyF"><span class="key">F</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyF" accept="audio/*">
+    </div>
+
+    <!-- FILA 4 -->
+    <div class="pad-container">
+      <div class="pad" data-key="KeyZ" id="pad-KeyZ"><span class="key">Z</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyZ" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="KeyX" id="pad-KeyX"><span class="key">X</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyX" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="KeyC" id="pad-KeyC"><span class="key">C</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyC" accept="audio/*">
+    </div>
+    <div class="pad-container">
+      <div class="pad" data-key="KeyV" id="pad-KeyV"><span class="key">V</span></div>
+      <input type="file" class="native-audio-input" id="file-KeyV" accept="audio/*">
+    </div>
+  </div>
+
+  <div class="status-bar" id="status">Esperando que cargues tu música...</div>
+
+  <script>
+    const statusText = document.getElementById('status');
+    const liveAudios = {};
+
+    function stopAllTracks() {
+      // Recorre todos los reproductores de audio guardados
+      Object.keys(liveAudios).forEach(k => {
+        if (liveAudios[k]) {
+          liveAudios[k].pause();       // Pausa el audio
+          liveAudios[k].currentTime = 0; // Lo regresa de inmediato al inicio
+        }
+      });
+    }
+
+    function setupPadAudio(file, key) {
+      if (!file) return;
+
+      try {
+        const streamBlobURL = URL.createObjectURL(file);
+        
+        const audioInstance = new Audio(streamBlobURL);
+        audioInstance.preload = "auto";
+        
+        liveAudios[key] = audioInstance;
+        
+        statusText.textContent = `¡Música "${file.name}" cargada con éxito! Presiona el pad.`;
+      } catch (e) {
+        statusText.textContent = "Error de compatibilidad con este archivo.";
+        console.error(e);
+      }
+    }
+
+    document.querySelectorAll('.pad').forEach(pad => {
+      const key = pad.getAttribute('data-key');
+      const container = pad.parentElement;
+      const fileInput = container.querySelector('.native-audio-input');
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          setupPadAudio(e.target.files[0], key); 
+        }
+      });
+
+      pad.addEventListener('click', () => {
+        const audio = liveAudios[key];
+        if (!audio) {
+          statusText.textContent = "Carga un archivo usando el botón gris de abajo de este pad.";
+          return;
+        }
+
+        // NUEVO: Detener absolutamente todos los otros sonidos que estén sonando antes de iniciar el nuevo
+        stopAllTracks();
+
+        // Asegurar reinicio desde el principio del archivo cargado
+        audio.currentTime = 0;
+        audio.play().catch(err => {
+          statusText.textContent = "Haz clic en la pantalla primero para dar permisos de audio.";
+        });
+
+        pad.classList.add('playing');
+        setTimeout(() => pad.classList.remove('playing'), 60);
+      });
+    });
+
+    window.addEventListener('keydown', (e) => {
+      const targetPad = document.getElementById(`pad-${e.code}`);
+      if (targetPad) {
+        targetPad.click();
+      }
+    });
+
+    // Enlazar botón de pánico manual
+    document.getElementById('stop-all-btn').addEventListener('click', () => {
+      stopAllTracks();
+      statusText.textContent = "Música detenida por completo.";
+    });
+  </script>
+</body>
+</html>
